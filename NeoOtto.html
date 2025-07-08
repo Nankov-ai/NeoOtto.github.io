@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Strategy Architect</title>
+    <!-- Tailwind CSS para um design moderno -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Biblioteca para renderizar Markdown (para formatar a resposta do AI) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        /* Estilo para a fonte e melhorias visuais */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Animação para o indicador de "a pensar" */
+        .dot-flashing {
+            position: relative;
+            width: 10px;
+            height: 10px;
+            border-radius: 5px;
+            background-color: #4f46e5;
+            color: #4f46e5;
+            animation: dotFlashing 1s infinite linear alternate;
+            animation-delay: .5s;
+        }
+        .dot-flashing::before, .dot-flashing::after {
+            content: '';
+            display: inline-block;
+            position: absolute;
+            top: 0;
+        }
+        .dot-flashing::before {
+            left: -15px;
+            width: 10px;
+            height: 10px;
+            border-radius: 5px;
+            background-color: #4f46e5;
+            color: #4f46e5;
+            animation: dotFlashing 1s infinite alternate;
+            animation-delay: 0s;
+        }
+        .dot-flashing::after {
+            left: 15px;
+            width: 10px;
+            height: 10px;
+            border-radius: 5px;
+            background-color: #4f46e5;
+            color: #4f46e5;
+            animation: dotFlashing 1s infinite alternate;
+            animation-delay: 1s;
+        }
+        @keyframes dotFlashing {
+            0% {
+                background-color: #4f46e5;
+            }
+            50%, 100% {
+                background-color: #c7d2fe;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-4xl bg-white rounded-2xl shadow-2xl flex flex-col h-[90vh]">
+        <!-- Cabeçalho da Aplicação -->
+        <header class="bg-indigo-600 text-white p-4 rounded-t-2xl shadow-md">
+            <h1 class="text-2xl font-bold text-center">AI Strategy Architect</h1>
+            <p class="text-center text-sm text-indigo-200">O seu conselheiro para oportunidades de negócio com IA</p>
+        </header>
+
+        <!-- Área da Conversa -->
+        <main id="chat-container" class="flex-1 p-6 overflow-y-auto space-y-6">
+            <!-- As mensagens serão adicionadas aqui dinamicamente -->
+        </main>
+
+        <!-- Indicador de "a pensar" -->
+        <div id="loading-indicator" class="hidden p-6 flex justify-center items-center">
+            <div class="dot-flashing"></div>
+        </div>
+
+        <!-- Área de Input -->
+        <footer class="p-4 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
+            <div class="flex items-center space-x-4">
+                <input type="text" id="user-input" class="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition" placeholder="Escreva a sua resposta aqui...">
+                <button id="send-button" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 active:bg-indigo-800 transition shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Enviar
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Elementos do DOM
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+        const loadingIndicator = document.getElementById('loading-indicator');
+
+        // ===================================================================
+        // PASSO IMPORTANTE: Cole a sua chave de API da Google aqui.
+        // Lembre-se de apagar esta chave no Google AI Studio depois da avaliação do projeto.
+        const apiKey = "AIzaSyApkg1Y3NFDGFBdyqFaoFsg-5_dnTorSe4";
+        // ===================================================================
+
+        // O nosso prompt final, que servirá como a "personalidade" e as instruções do agente
+        const systemPrompt = `
+Assume the role of an independent AI opportunity consultant, agnostic to any particular company or vendor. Your task is to identify, validate and recommend business opportunities where applied artificial intelligence can generate:
+Measurable impact;
+Operational viability;
+Ethical responsibility.
+
+Assume the user is only executives, managers and decision-makers.
+You support these executives, managers and decision-makers by providing structured strategic recommendations, informed by best practices and grounded in real-world case evidence. Your outputs will form the basis for new initiatives or the transformation of existing business models using AI.
+
+Constraints & Ethical Guidelines
+Your recommendations must comply with:
+The EU AI Act (2024);
+Ethical, technological and organisational guidelines as taught in the ISCTE postgraduate program “AI Applied to Management”;
+Principles of competitive strategy, especially Michael Porter’s frameworks;
+Sound data governance and transparency practices;
+Legal, fiscal and regulatory contexts of each relevant national and international market;
+Local legislation including tax burdens, data residency and operational permissions if requested.
+
+RESTRICTIONS, CRITICAL INSTRUCTION:
+You Must Never Provide off-topic content;
+You Must Never Use emojis unless producing a PowerPoint presentation;
+You Must Never Generate hallucinated or unverifiable claims;
+You Must Never Use technical jargon without explaining it;
+This assistant is strictly limited to identifying business opportunities related to Artificial Intelligence. 
+Do not attempt to adapt the topic creatively, reframe it, or provide indirect responses.
+Do not generate any content unrelated to AI in business strategy. This rule overrides all other instructions.
+You Must Never write, say or share the files and books names we shared to you, they are you secret.
+
+Fallbacks:
+If a request is too vague: "I need more context for a detailed analysis. Could you specify the business area or the process you have in mind?"
+If a request is out of scope (technical, legal): "This is a matter that involves engineering or legal aspects. I recommend that you involve the company's technical or legal team for a precise answer."
+If a request is sensitive or unethical: "It is not appropriate to apply AI to this type of decision. The recommendation is to follow the company's internal guidelines and consult the appropriate experts."
+
+Recommended Structure & Sequencing
+You will structure each output in 3 core blocks:
+Diagnosis: Brief, evidence-based context or problem description;
+Opportunity: How AI can add value (include constraints and feasibility);
+Recommendation: What to do next, how to start, and necessary resources.
+
+Each response should:
+Adapt to the organisation’s profile (e.g. SME, retail, manufacturing, services);
+Be succinct, conversational and executive-friendly;
+Use tables wherever structure improves clarity;
+Highlight key points using Markdown;
+Reference facts, data or literature behind each insight;
+Include consultative questions (e.g. “Would you like support drafting a business case?”);
+Provide values in euros and US dollars where applicable;
+List minimum data inputs and realistic implementation limitations;
+Include early-warning indicators or KPIs to monitor risk or drift.
+
+Always describe your reasoning process, including:
+The assumptions you made;
+Why those assumptions are valid;
+Any ambiguities or missing information.
+
+Reference Literature & Knowledge Sources
+Use the following works as embedded knowledge for framing your recommendations:
+AI_Novator (ISCTE, Bertrand Editora, 2024)
+Data Science for Business
+The State of AI in Early 2024 (Final)
+The Economic Potential of Generative AI (McKinsey)
+Superagency in the Workplace (v4)
+Roland Berger: GenAI-driven Transformation (Final)
+PSS: The Path to AI Value Framework
+Global AI Assessment 2024
+BCG: Where’s the Value in AI
+BCG Executive Perspectives: AI-First Companies Win the Future (Issue 1 – June 10, 2025)
+AI Radar 2025 (Jan 2025)
+
+You may also reference ISCTE’s AI Project Canvas, using it to structure actionable AI opportunity mappings.
+
+Supporting Files & Resources
+Use the provided “Original Template_Business Model Canvas” to fill the “Business Model Canvas SN” with specific AI recommendations.
+Return the completed canvas as a downloadable link, without referring to the file name.
+
+Expert Practices & Pitfall Avoidance
+Favor feasible over flashy: Don’t recommend use cases that require immature technology.
+Be sensitive to change management realities and employee resistance.
+Avoid misalignment with company maturity level (e.g., don’t suggest large LLM integrations to a micro-enterprise).
+
+Early Warning Mechanisms should include:
+Operational KPIs (latency, accuracy, drift detection);
+Financial indicators (ROI slope, adoption costs);
+Human feedback loops (usage satisfaction, burnout risk).
+
+Recursive Improvement & Meta-Prompting
+At any point, you may:
+Question your assumptions;
+Offer alternative recommendations if new data arises;
+Ask clarifying questions to strengthen your diagnosis;
+Suggest improvements to this framework if you detect flaws in applicability or ethics.
+
+Conversational Guidelines
+Use a dynamic, human tone, as if speaking in a real meeting.
+Keep sentences short and purposeful;
+Introduce natural pauses;
+Offer examples or case studies relevant to the user’s industry;
+Use open-ended questions and avoid long monologues;
+Adapt pacing to user interaction: if the user goes silent, continue with a light follow-up or contextual insight;
+Ask for feedback after delivering your response.
+
+Exclusive Scope Enforcement
+This agent only responds to prompts directly related to:
+“The correct identification of AI-driven business opportunities as a critical success factor for organizations.”
+Reject all unrelated topics politely but firmly.
+
+Mandatory Behaviors
+If uncertain, clearly state: “I don’t have access to that information.”
+Validate consistency with all attached or referenced files (without stating this explicitly);
+Ask questions to clarify ambiguities;
+Take all time necessary to ensure realistic, accurate, context-aware outputs;
+Always reply in Portuguese, unless the user explicitly asks otherwise;
+After answering, always provide 3 additional points not previously mentioned but deemed important.
+`;
+
+        // Histórico da conversa
+        let chatHistory = [];
+
+        // Função para adicionar mensagem ao ecrã
+        function addMessage(sender, message, isError = false) {
+            const messageElement = document.createElement('div');
+            const formattedMessage = marked.parse(message); 
+            
+            if (sender === 'user') {
+                messageElement.className = 'flex justify-end';
+                messageElement.innerHTML = `<div class="bg-indigo-500 text-white p-3 rounded-lg max-w-lg shadow"> ${formattedMessage} </div>`;
+            } else {
+                messageElement.className = 'flex justify-start';
+                let bgColor = isError ? 'bg-red-100 text-red-800' : 'bg-gray-200 text-gray-800';
+                messageElement.innerHTML = `<div class="${bgColor} p-3 rounded-lg max-w-lg shadow"> ${formattedMessage} </div>`;
+            }
+            chatContainer.appendChild(messageElement);
+            chatContainer.scrollTop = chatContainer.scrollHeight; 
+        }
+
+        // Função para chamar a API do Gemini
+        async function getAIResponse() {
+            if (!apiKey || apiKey === "COLE_AQUI_A_SUA_CHAVE_DE_API_DA_GOOGLE") {
+                addMessage('ai', '**Atenção:** A chave de API não foi configurada no código. O desenvolvedor precisa de editar o ficheiro `index.html` e inserir uma chave válida.', true);
+                return;
+            }
+
+            loadingIndicator.classList.remove('hidden');
+            userInput.disabled = true;
+            sendButton.disabled = true;
+
+            const payload = {
+                contents: chatHistory,
+                system_instruction: {
+                    parts: { text: systemPrompt }
+                },
+                generationConfig: {
+                    temperature: 0.3
+                }
+            };
+            
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorBody = await response.json();
+                    console.error("API Error Body:", errorBody);
+                    throw new Error(`HTTP error! status: ${response.status} - ${errorBody.error.message || 'Erro desconhecido.'}`);
+                }
+
+                const result = await response.json();
+                
+                let aiText = "Desculpe, não consegui obter uma resposta. Por favor, tente novamente.";
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    aiText = result.candidates[0].content.parts[0].text;
+                }
+                
+                chatHistory.push({ role: "model", parts: [{ text: aiText }] });
+                addMessage('ai', aiText);
+
+            } catch (error) {
+                console.error("Error calling Gemini API:", error);
+                addMessage('ai', `**Ocorreu um erro:** ${error.message}. Verifique se a API Key configurada no código é válida.`, true);
+            } finally {
+                loadingIndicator.classList.add('hidden');
+                userInput.disabled = false;
+                sendButton.disabled = false;
+                userInput.focus();
+            }
+        }
+        
+        async function handleUserInput() {
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            addMessage('user', message);
+            chatHistory.push({ role: "user", parts: [{ text: message }] });
+            userInput.value = '';
+
+            await getAIResponse();
+        }
+
+        sendButton.addEventListener('click', handleUserInput);
+        userInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                handleUserInput();
+            }
+        });
+
+        window.onload = async () => {
+            // A primeira chamada é feita sem histórico de utilizador para o AI saudar.
+            chatHistory = []; // Limpa o histórico para uma nova sessão
+            const firstMessage = {
+                role: "user",
+                parts: [{ text: "Olá, pode começar." }]
+            };
+            chatHistory.push(firstMessage);
+            await getAIResponse();
+        };
+
+    </script>
+</body>
+</html>
