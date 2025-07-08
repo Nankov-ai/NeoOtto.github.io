@@ -82,11 +82,6 @@
 
         <!-- Área de Input -->
         <footer class="p-4 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
-             <!-- NOVO: Campo para a API Key -->
-            <div class="mb-2">
-                <label for="api-key-input" class="text-xs text-gray-600">A sua Google AI API Key:</label>
-                <input type="password" id="api-key-input" class="w-full p-2 border border-gray-300 rounded-lg text-xs" placeholder="Cole aqui a sua chave de API">
-            </div>
             <div class="flex items-center space-x-4">
                 <input type="text" id="user-input" class="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition" placeholder="Escreva a sua resposta aqui...">
                 <button id="send-button" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 active:bg-indigo-800 transition shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
@@ -102,7 +97,10 @@
         const userInput = document.getElementById('user-input');
         const sendButton = document.getElementById('send-button');
         const loadingIndicator = document.getElementById('loading-indicator');
-        const apiKeyInput = document.getElementById('api-key-input'); // NOVO
+
+        // IMPORTANTE: Cole a sua chave de API aqui.
+        // Lembre-se de apagar esta chave no Google AI Studio depois da avaliação do projeto.
+        const apiKey = "AIzaSyA07VcnqLhxnpaIdfGgLEFJmfMK0Y8zrpg";
 
         // O nosso prompt final, que servirá como a "personalidade" e as instruções do agente
         const systemPrompt = `
@@ -165,9 +163,8 @@ You are the AI Strategy Architect. Your purpose is to create modular, internet-v
 
         // Função para chamar a API do Gemini
         async function getAIResponse() {
-            const apiKey = apiKeyInput.value.trim(); // NOVO: Obter a chave do input
-            if (!apiKey) {
-                addMessage('ai', '**Atenção:** Por favor, insira a sua Google AI API Key para começar. Pode obter uma gratuitamente no [Google AI Studio](https://aistudio.google.com/app/apikey).', true);
+            if (!apiKey || apiKey === "COLE_AQUI_A_SUA_CHAVE_DE_API_DA_GOOGLE") {
+                addMessage('ai', '**Atenção:** A chave de API não foi configurada no código. O desenvolvedor precisa de editar o ficheiro `index.html` e inserir uma chave válida.', true);
                 return;
             }
 
@@ -185,7 +182,6 @@ You are the AI Strategy Architect. Your purpose is to create modular, internet-v
                 }
             };
             
-            // NOVO: Usar a chave do utilizador no URL
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
             try {
@@ -215,7 +211,7 @@ You are the AI Strategy Architect. Your purpose is to create modular, internet-v
 
             } catch (error) {
                 console.error("Error calling Gemini API:", error);
-                addMessage('ai', `**Ocorreu um erro:** ${error.message}. Verifique se a sua API Key está correta e tem as permissões necessárias.`, true);
+                addMessage('ai', `**Ocorreu um erro:** ${error.message}. Verifique se a API Key configurada no código é válida.`, true);
             } finally {
                 loadingIndicator.classList.add('hidden');
                 userInput.disabled = false;
@@ -242,10 +238,15 @@ You are the AI Strategy Architect. Your purpose is to create modular, internet-v
             }
         });
 
-        window.onload = () => {
-             // NOVO: Mensagem inicial a pedir a chave de API
-            addMessage('ai', 'Bem-vindo ao **AI Strategy Architect**! Para começar, por favor, cole a sua chave de API da Google no campo abaixo e envie a sua primeira mensagem.');
+        window.onload = async () => {
+            // A primeira chamada é feita sem histórico de utilizador para o AI saudar.
+            await getAIResponse();
         };
+
+    </script>
+</body>
+</html>
+
 
     </script>
 </body>
