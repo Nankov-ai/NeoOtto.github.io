@@ -82,6 +82,11 @@
 
         <!-- Área de Input -->
         <footer class="p-4 border-t border-gray-200 bg-gray-50 rounded-b-2xl">
+             <!-- NOVO: Campo para a API Key -->
+            <div class="mb-2">
+                <label for="api-key-input" class="text-xs text-gray-600">A sua Google AI API Key:</label>
+                <input type="password" id="api-key-input" class="w-full p-2 border border-gray-300 rounded-lg text-xs" placeholder="Cole aqui a sua chave de API">
+            </div>
             <div class="flex items-center space-x-4">
                 <input type="text" id="user-input" class="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition" placeholder="Escreva a sua resposta aqui...">
                 <button id="send-button" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 active:bg-indigo-800 transition shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
@@ -97,6 +102,7 @@
         const userInput = document.getElementById('user-input');
         const sendButton = document.getElementById('send-button');
         const loadingIndicator = document.getElementById('loading-indicator');
+        const apiKeyInput = document.getElementById('api-key-input'); // NOVO
 
         // O nosso prompt final, que servirá como a "personalidade" e as instruções do agente
         const systemPrompt = `
@@ -137,55 +143,50 @@ You are the AI Strategy Architect. Your purpose is to create modular, internet-v
 7. Bonus Enhancements (Optional): Offer to provide simulated focus group feedback, a Business Model Canvas visualization, or deep-dive expansion requests.
 `;
 
-        // Estado da Conversa
+        // Histórico da conversa
         let chatHistory = [];
-        let questionState = 0; // Para controlar o fluxo de perguntas iniciais
-        const questions = [
-            "Para começar, qual é o seu principal objetivo de negócio? (ex: entrar num novo mercado, lançar um produto, etc.)",
-            "Pode descrever brevemente o produto ou serviço?",
-            "Qual é a geografia alvo? (ex: Portugal, Europa, etc.)",
-            "Já conhece alguns concorrentes?",
-            "Qual é o tipo de cliente alvo? (ex: empresas B2B, consumidores finais, etc.)"
-        ];
 
         // Função para adicionar mensagem ao ecrã
-        function addMessage(sender, message) {
+        function addMessage(sender, message, isError = false) {
             const messageElement = document.createElement('div');
-            const formattedMessage = marked.parse(message); // Converte Markdown para HTML
+            const formattedMessage = marked.parse(message); 
             
             if (sender === 'user') {
                 messageElement.className = 'flex justify-end';
                 messageElement.innerHTML = `<div class="bg-indigo-500 text-white p-3 rounded-lg max-w-lg shadow"> ${formattedMessage} </div>`;
             } else {
                 messageElement.className = 'flex justify-start';
-                messageElement.innerHTML = `<div class="bg-gray-200 text-gray-800 p-3 rounded-lg max-w-lg shadow"> ${formattedMessage} </div>`;
+                let bgColor = isError ? 'bg-red-100 text-red-800' : 'bg-gray-200 text-gray-800';
+                messageElement.innerHTML = `<div class="${bgColor} p-3 rounded-lg max-w-lg shadow"> ${formattedMessage} </div>`;
             }
             chatContainer.appendChild(messageElement);
-            chatContainer.scrollTop = chatContainer.scrollHeight; // Auto-scroll para a última mensagem
+            chatContainer.scrollTop = chatContainer.scrollHeight; 
         }
 
         // Função para chamar a API do Gemini
         async function getAIResponse() {
+            const apiKey = apiKeyInput.value.trim(); // NOVO: Obter a chave do input
+            if (!apiKey) {
+                addMessage('ai', '**Atenção:** Por favor, insira a sua Google AI API Key para começar. Pode obter uma gratuitamente no [Google AI Studio](https://aistudio.google.com/app/apikey).', true);
+                return;
+            }
+
             loadingIndicator.classList.remove('hidden');
             userInput.disabled = true;
             sendButton.disabled = true;
 
-            // Construir o payload para a API
-            // O histórico contém o prompt do sistema e a conversa até agora
             const payload = {
-                contents: [
-                    ...chatHistory
-                ],
-                "system_instruction": {
-                    "parts": { "text": systemPrompt }
+                contents: chatHistory,
+                system_instruction: {
+                    parts: { text: systemPrompt }
                 },
-                "generationConfig": {
-                    "temperature": 0.3
+                generationConfig: {
+                    temperature: 0.3
                 }
             };
-
-            const apiKey = ""; // Deixar em branco, será gerido pelo ambiente
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            
+            // NOVO: Usar a chave do utilizador no URL
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
             try {
                 const response = await fetch(apiUrl, {
@@ -195,7 +196,9 @@ You are the AI Strategy Architect. Your purpose is to create modular, internet-v
                 });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    const errorBody = await response.json();
+                    console.error("API Error Body:", errorBody);
+                    throw new Error(`HTTP error! status: ${response.status} - ${errorBody.error.message || 'Erro desconhecido.'}`);
                 }
 
                 const result = await response.json();
@@ -207,13 +210,12 @@ You are the AI Strategy Architect. Your purpose is to create modular, internet-v
                     aiText = result.candidates[0].content.parts[0].text;
                 }
                 
-                // Adiciona a resposta do AI ao histórico e ao ecrã
                 chatHistory.push({ role: "model", parts: [{ text: aiText }] });
                 addMessage('ai', aiText);
 
             } catch (error) {
                 console.error("Error calling Gemini API:", error);
-                addMessage('ai', "Ocorreu um erro ao comunicar com o assistente. Verifique a consola para mais detalhes.");
+                addMessage('ai', `**Ocorreu um erro:** ${error.message}. Verifique se a sua API Key está correta e tem as permissões necessárias.`, true);
             } finally {
                 loadingIndicator.classList.add('hidden');
                 userInput.disabled = false;
@@ -222,7 +224,6 @@ You are the AI Strategy Architect. Your purpose is to create modular, internet-v
             }
         }
         
-        // Função para gerir o fluxo da conversa
         async function handleUserInput() {
             const message = userInput.value.trim();
             if (!message) return;
@@ -231,23 +232,9 @@ You are the AI Strategy Architect. Your purpose is to create modular, internet-v
             chatHistory.push({ role: "user", parts: [{ text: message }] });
             userInput.value = '';
 
-            // Se ainda estamos na fase de perguntas
-            if (questionState < questions.length) {
-                const nextQuestion = questions[questionState];
-                addMessage('ai', nextQuestion);
-                chatHistory.push({ role: "model", parts: [{ text: nextQuestion }] });
-                questionState++;
-                if (questionState === questions.length) {
-                    addMessage('ai', "Excelente. Obrigado pela informação. Vou agora analisar tudo e preparar o seu relatório estratégico.");
-                    await getAIResponse(); // Chama a API para o relatório final
-                }
-            } else {
-                // Se já passámos as perguntas, cada nova mensagem é um follow-up
-                await getAIResponse();
-            }
+            await getAIResponse();
         }
 
-        // Event Listeners
         sendButton.addEventListener('click', handleUserInput);
         userInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
@@ -255,17 +242,9 @@ You are the AI Strategy Architect. Your purpose is to create modular, internet-v
             }
         });
 
-        // Iniciar a conversa
         window.onload = () => {
-            const initialMessage = "Olá! Sou o AI Strategy Architect. Estou aqui para o ajudar a identificar e validar oportunidades de negócio com Inteligência Artificial.";
-            addMessage('ai', initialMessage);
-            chatHistory.push({ role: "model", parts: [{ text: initialMessage }] });
-            
-            // Faz a primeira pergunta
-            const firstQuestion = questions[questionState];
-            addMessage('ai', firstQuestion);
-            chatHistory.push({ role: "model", parts: [{ text: firstQuestion }] });
-            questionState++;
+             // NOVO: Mensagem inicial a pedir a chave de API
+            addMessage('ai', 'Bem-vindo ao **AI Strategy Architect**! Para começar, por favor, cole a sua chave de API da Google no campo abaixo e envie a sua primeira mensagem.');
         };
 
     </script>
