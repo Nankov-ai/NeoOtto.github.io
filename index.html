@@ -1,484 +1,127 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NeoOtto.ai - Oráculo de Oportunidades de Negócio</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #333;
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* Header */
-        .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 0;
-        }
-
-        .logo {
-            font-size: 1.8rem;
-            font-weight: bold;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .nav-links {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: #333;
-            font-weight: 500;
-            transition: color 0.3s ease;
-        }
-
-        .nav-links a:hover {
-            color: #667eea;
-        }
-
-        /* Hero Section */
-        .hero {
-            padding: 6rem 0;
-            text-align: center;
-            color: white;
-        }
-
-        .hero h1 {
-            font-size: 3.5rem;
-            margin-bottom: 1rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .cta-button {
-            display: inline-block;
-            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
-            color: white;
-            padding: 1rem 2rem;
-            text-decoration: none;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
-        }
-
-        .cta-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
-        }
-
-        /* Features Section */
-        .features {
-            padding: 4rem 0;
-            background: white;
-        }
-
-        .section-title {
-            text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 3rem;
-            color: #333;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-
-        .feature-card {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            padding: 2rem;
-            border-radius: 20px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .feature-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        .feature-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: #333;
-        }
-
-        .feature-card p {
-            color: #666;
-            line-height: 1.6;
-        }
-
-        /* Process Section */
-        .process {
-            padding: 4rem 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .process-steps {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
-        }
-
-        .process-step {
-            text-align: center;
-            padding: 2rem;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
-        }
-
-        .process-step h3 {
-            font-size: 1.3rem;
-            margin-bottom: 1rem;
-            color: #fff;
-        }
-
-        .step-number {
-            display: inline-block;
-            background: rgba(255, 255, 255, 0.2);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            line-height: 40px;
-            margin-bottom: 1rem;
-            font-weight: bold;
-        }
-
-        /* Example Section */
-        .example {
-            padding: 4rem 0;
-            background: #f8f9fa;
-        }
-
-        .example-content {
-            background: white;
-            padding: 3rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            margin-top: 2rem;
-        }
-
-        .example-content h3 {
-            color: #667eea;
-            font-size: 1.8rem;
-            margin-bottom: 1rem;
-        }
-
-        .example-content h4 {
-            color: #333;
-            font-size: 1.2rem;
-            margin: 1.5rem 0 0.5rem 0;
-        }
-
-        .example-content p {
-            color: #666;
-            margin-bottom: 1rem;
-        }
-
-        /* Team Section */
-        .team {
-            padding: 4rem 0;
-            background: white;
-        }
-
-        .team-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-top: 2rem;
-        }
-
-        .team-member {
-            text-align: center;
-            padding: 1.5rem;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .team-member h4 {
-            color: #333;
-            margin-bottom: 0.5rem;
-        }
-
-        /* Footer */
-        .footer {
-            background: #333;
-            color: white;
-            padding: 2rem 0;
-            text-align: center;
-        }
-
-        .footer p {
-            margin-bottom: 1rem;
-        }
-
-        .footer a {
-            color: #667eea;
-            text-decoration: none;
-        }
-
-        .footer a:hover {
-            text-decoration: underline;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-            
-            .nav-links {
-                display: none;
-            }
-            
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>NeoOtto.ai – Missão III | ISCTE</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    header {
+      background-color: #002b45;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    main {
+      padding: 40px 20px;
+      max-width: 900px;
+      margin: auto;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+    h1, h2 {
+      color: #002b45;
+    }
+    p {
+      line-height: 1.6;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    table, th, td {
+      border: 1px solid #ccc;
+    }
+    th, td {
+      padding: 8px 12px;
+      text-align: left;
+    }
+    .button {
+      display: inline-block;
+      padding: 12px 20px;
+      margin-top: 20px;
+      background-color: #006494;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 5px;
+    }
+    footer {
+      background-color: #002b45;
+      color: white;
+      text-align: center;
+      padding: 10px;
+      margin-top: 40px;
+    }
+  </style>
 </head>
 <body>
-    <header class="header">
-        <nav class="nav container">
-            <div class="logo">NeoOtto.ai</div>
-            <ul class="nav-links">
-                <li><a href="#features">Funcionalidades</a></li>
-                <li><a href="#process">Processo</a></li>
-                <li><a href="#example">Exemplo</a></li>
-                <li><a href="#team">Equipa</a></li>
-            </ul>
-        </nav>
-    </header>
+  <header>
+    <h1>NeoOtto.ai – Missão III</h1>
+    <p>LLM para identificação de oportunidades de negócio com IA</p>
+  </header>
 
-    <main>
-        <section class="hero">
-            <div class="container">
-                <h1>NeoOtto.ai</h1>
-                <p>O Oráculo de Inteligência Artificial para Identificação de Oportunidades de Negócio</p>
-                <a href="https://chatgpt.com/g/g-6867dda33f808191a1c2e26f47d4fa1c-neootto-ai" class="cta-button" target="_blank">
-                    🚀 Aceder ao Oráculo
-                </a>
-            </div>
-        </section>
+  <main>
+    <h2>🎯 Objetivo do Projeto</h2>
+    <p>A Missão III da Pós-Graduação em IA Aplicada à Gestão (ISCTE) desafiou o grupo a criar um GPT especializado para ajudar gestores a identificar oportunidades de negócio com base em IA.</p>
 
-        <section class="features" id="features">
-            <div class="container">
-                <h2 class="section-title">Características Distintivas</h2>
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <div class="feature-icon">🎯</div>
-                        <h3>Consultor Agnóstico</h3>
-                        <p>Adaptável a diferentes setores, dimensões e níveis de maturidade digital das organizações.</p>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">📊</div>
-                        <h3>Estrutura Clara</h3>
-                        <p>Diagnóstico → Oportunidade → Recomendação. Respostas baseadas em dados e raciocínio explícito.</p>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">⚖️</div>
-                        <h3>Ética e Conformidade</h3>
-                        <p>Integração de regulamentação (AI Act 2024) e fundamentos éticos na consultoria estratégica.</p>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">🎨</div>
-                        <h3>Business Model Canvas</h3>
-                        <p>Criação colaborativa de modelos de negócio com explicação automatizada e estruturada.</p>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">💡</div>
-                        <h3>Impacto Quantificável</h3>
-                        <p>Propostas de casos de uso com impacto mensurável em euros e dólares para ROI claro.</p>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon">🌍</div>
-                        <h3>Benchmarks Internacionais</h3>
-                        <p>Sugestões baseadas em estudos de caso e boas práticas internacionais de referência.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+    <h2>⚙️ Como funciona o Oráculo</h2>
+    <ul>
+      <li>Diagnóstico → Oportunidade → Recomendação</li>
+      <li>Tom consultivo e linguagem executiva</li>
+      <li>Adapta-se a PME, retalho, indústria ou serviços</li>
+      <li>Integra frameworks como AI Project Canvas e AI Act</li>
+    </ul>
 
-        <section class="process" id="process">
-            <div class="container">
-                <h2 class="section-title">Processo Metodológico</h2>
-                <div class="process-steps">
-                    <div class="process-step">
-                        <div class="step-number">1</div>
-                        <h3>Design do Oráculo</h3>
-                        <p>Definição da persona consultiva com estilo estruturado e empático, adaptável a diferentes perfis organizacionais.</p>
-                    </div>
-                    <div class="process-step">
-                        <div class="step-number">2</div>
-                        <h3>Curadoria de Conhecimento</h3>
-                        <p>Alimentação com literatura de referência: McKinsey, BCG, AI Act 2024, frameworks académicos do ISCTE.</p>
-                    </div>
-                    <div class="process-step">
-                        <div class="step-number">3</div>
-                        <h3>Afinamento do LLM</h3>
-                        <p>Customização no ChatGPT com temperatura controlada (0.4) e gatilhos consultivos para consistência.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+    <h2>🌾 Caso de Estudo: Cooperativas Agrícolas</h2>
+    <p><strong>Desafio:</strong> Apoiar pequenos agricultores a prever colheitas, preços e acesso a mercado.</p>
+    <p><strong>Recomendação:</strong> Plataforma com IA generativa e preditiva que fornece recomendações adaptadas por tipo de cultura e região.</p>
+    <p><strong>Impacto:</strong> Aumento de rendimento por hectare, redução de desperdício e maior poder negocial das cooperativas.</p>
 
-        <section class="example" id="example">
-            <div class="container">
-                <h2 class="section-title">Exemplo Prático: Cooperativas Agrícolas</h2>
-                <div class="example-content">
-                    <h3>Cenário</h3>
-                    <p>Uma cooperativa agrícola regional pretende explorar como a IA pode ajudar pequenos e médios produtores a tomar decisões mais informadas e sustentáveis.</p>
-                    
-                    <h4>📋 Diagnóstico</h4>
-                    <p>O setor agrícola enfrenta volatilidade nos preços, imprevisibilidade climática, excesso de intermediários e falta de informação integrada. As cooperativas têm baixa digitalização e pouca capacidade preditiva.</p>
-                    
-                    <h4>💡 Oportunidade</h4>
-                    <p>Aplicar IA para integrar previsões meteorológicas, históricos de colheita e dados de mercado em tempo real, oferecendo recomendações inteligentes sobre o melhor momento para plantar, colher e vender.</p>
-                    
-                    <h4>🎯 Recomendação</h4>
-                    <p>Desenvolver uma plataforma de apoio à decisão com IA generativa e modelos de previsão, acessível via app simples, com recomendações em linguagem natural adaptadas ao tipo de cultura e localização.</p>
-                    
-                    <h4>📈 Impacto Esperado</h4>
-                    <p>Redução de perdas operacionais, aumento do rendimento líquido por hectare, valorização dos produtos regionais e maior autonomia na negociação com distribuidores.</p>
-                </div>
-            </div>
-        </section>
+    <h2>📚 Fontes do Oráculo</h2>
+    <table>
+      <tr>
+        <th>Tipo</th>
+        <th>Exemplo</th>
+        <th>Aplicação</th>
+      </tr>
+      <tr>
+        <td>Livro</td>
+        <td>AI_Novator (ISCTE)</td>
+        <td>Fundamento ético e estratégico</td>
+      </tr>
+      <tr>
+        <td>Estudos</td>
+        <td>McKinsey, BCG, Roland Berger</td>
+        <td>Benchmark e viabilidade</td>
+      </tr>
+      <tr>
+        <td>Regulamento</td>
+        <td>EU AI Act (2024)</td>
+        <td>Conformidade e avaliação de risco</td>
+      </tr>
+      <tr>
+        <td>Frameworks</td>
+        <td>AI Project Canvas</td>
+        <td>Organização e diagnóstico</td>
+      </tr>
+    </table>
 
-        <section class="team" id="team">
-            <div class="container">
-                <h2 class="section-title">Equipa de Desenvolvimento</h2>
-                <div class="team-grid">
-                    <div class="team-member">
-                        <h4>Fernando Costa</h4>
-                        <p>GT4 Grupo 3</p>
-                    </div>
-                    <div class="team-member">
-                        <h4>Maria Vieira</h4>
-                        <p>GT4 Grupo 3</p>
-                    </div>
-                    <div class="team-member">
-                        <h4>Miguel Anim</h4>
-                        <p>GT4 Grupo 3</p>
-                    </div>
-                    <div class="team-member">
-                        <h4>José Luís</h4>
-                        <p>GT4 Grupo 3</p>
-                    </div>
-                    <div class="team-member">
-                        <h4>José Gomes</h4>
-                        <p>GT4 Grupo 3</p>
-                    </div>
-                    <div class="team-member">
-                        <h4>Rui Baltazar</h4>
-                        <p>GT4 Grupo 3</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
+    <h2>🔗 Ligações Importantes</h2>
+    <p><a class="button" href="https://chatgpt.com/g/g-6867dda33f808191a1c2e26f47d4fa1c-neootto-ai" target="_blank">🚀 Aceder ao Oráculo no ChatGPT</a></p>
+    <p><a class="button" href="https://drive.google.com/file/d/1NTzGXn8bqlHJ8h9u59fsSVt1ZJiZMFns/view?usp=drive_link" target="_blank">📄 Ver Documento Resumo (2 páginas)</a></p>
 
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2024 NeoOtto.ai - Projeto desenvolvido no âmbito da Pós-Graduação em Inteligência Artificial Aplicada à Gestão</p>
-            <p><strong>ISCTE Executive Education</strong> | <a href="https://chatgpt.com/g/g-6867dda33f808191a1c2e26f47d4fa1c-neootto-ai" target="_blank">Aceder ao Oráculo</a></p>
-        </div>
-    </footer>
+  </main>
 
-    <script>
-        // Smooth scrolling for navigation links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
-        });
-
-        // Add scroll effect to header
-        window.addEventListener('scroll', function() {
-            const header = document.querySelector('.header');
-            if (window.scrollY > 100) {
-                header.style.background = 'rgba(255, 255, 255, 0.98)';
-            } else {
-                header.style.background = 'rgba(255, 255, 255, 0.95)';
-            }
-        });
-
-        // Animate feature cards on scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver(function(entries) {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.feature-card, .process-step').forEach(card => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-            observer.observe(card);
-        });
-    </script>
+  <footer>
+    <p>GT4 – Fernando Costa, Maria Vieira, Miguel Anim, José Luís, José Gomes, Rui Baltazar – ISCTE 2025</p>
+  </footer>
 </body>
 </html>
