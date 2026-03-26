@@ -1,122 +1,345 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-  <meta charset="UTF-8">
-  <title>NeoOtto.ai – Missão III | ISCTE</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NeoOtto.ai · Consultor de Oportunidades com IA</title>
+  <meta name="description" content="NeoOtto.ai é um agente de IA especializado em identificar oportunidades de negócio para gestores e empresas." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Fraunces:ital,wght@1,300&display=swap" rel="stylesheet" />
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:    #0e0e0e;
+      --paper:  #f5f4f0;
+      --signal: #00c896;
+      --stone:  #9a9690;
+      --border: #222;
+    }
+
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f9f9f9;
-      margin: 0;
-      padding: 0;
-      color: #333;
-    }
-    header {
-      background-color: #002b45;
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
-    main {
-      padding: 40px 20px;
-      max-width: 900px;
-      margin: auto;
-      background: white;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
-    }
-    h1, h2 {
-      color: #002b45;
-    }
-    p {
+      background: var(--ink);
+      color: var(--paper);
+      font-family: 'DM Mono', monospace;
+      font-weight: 400;
       line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
+
+    /* ── NAV ── */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 clamp(1.5rem, 5vw, 4rem);
+      height: 60px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
     }
-    table, th, td {
-      border: 1px solid #ccc;
+    .nav-logo { display: flex; align-items: center; gap: .75rem; text-decoration: none; }
+    .nav-wordmark {
+      font-family: 'DM Mono', monospace;
+      font-weight: 500; font-size: .95rem;
+      letter-spacing: .08em; color: var(--paper);
     }
-    th, td {
-      padding: 8px 12px;
-      text-align: left;
+    .nav-sub {
+      font-size: .7rem; color: var(--stone); letter-spacing: .06em;
     }
-    .button {
+
+    /* ── HERO ── */
+    .hero {
+      padding: 6rem clamp(1.5rem, 5vw, 4rem) 5rem;
+      max-width: 1280px; margin: 0 auto;
+      position: relative;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: rgba(0,200,150,.1);
+      border: 1px solid rgba(0,200,150,.25);
+      padding: .35rem .9rem;
+      font-size: .68rem; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--signal); margin-bottom: 2rem;
+    }
+    .badge-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--signal);
+      box-shadow: 0 0 8px var(--signal);
+      animation: pulse 2s infinite;
+    }
+    .hero-title {
+      font-size: clamp(2.4rem, 6vw, 4.5rem);
+      font-weight: 300; letter-spacing: -.025em; line-height: 1.05;
+      margin-bottom: 1.5rem;
+    }
+    .hero-title .highlight { color: var(--signal); }
+    .hero-sub {
+      font-family: 'Fraunces', serif; font-style: italic; font-weight: 300;
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--stone); margin-bottom: 2.5rem; max-width: 560px;
+    }
+    .btn-primary {
       display: inline-block;
-      padding: 12px 20px;
-      margin-top: 15px;
-      margin-right: 10px;
-      background-color: #006494;
-      color: white;
-      text-decoration: none;
-      font-weight: bold;
-      border-radius: 5px;
+      padding: .85rem 2.2rem;
+      background: var(--signal); color: var(--ink);
+      font-family: 'DM Mono', monospace; font-size: .8rem;
+      font-weight: 500; letter-spacing: .08em;
+      text-decoration: none; transition: background .2s, transform .15s;
     }
+    .btn-primary:hover { background: #00e8ad; transform: translateY(-2px); }
+
+    /* ── CONTENT ── */
+    .content {
+      max-width: 1280px; margin: 0 auto;
+      padding: 0 clamp(1.5rem, 5vw, 4rem) 6rem;
+    }
+
+    /* ── COMO FUNCIONA ── */
+    .section-label {
+      font-size: .68rem; letter-spacing: .15em; text-transform: uppercase;
+      color: var(--signal); margin-bottom: .75rem;
+      display: flex; align-items: center; gap: .6rem;
+    }
+    .section-label::after {
+      content: ''; flex: 1; max-width: 40px; height: 1px;
+      background: var(--signal); opacity: .4;
+    }
+    .section-title {
+      font-size: clamp(1.4rem, 2.5vw, 1.9rem); font-weight: 300;
+      letter-spacing: -.015em; margin-bottom: 2.5rem; line-height: 1.2;
+    }
+
+    .steps {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 1px; background: var(--border);
+      border: 1px solid var(--border);
+      margin-bottom: 5rem;
+    }
+    .step {
+      background: #111; padding: 2rem 1.75rem;
+      position: relative;
+    }
+    .step-num {
+      font-size: .6rem; letter-spacing: .14em; color: var(--signal);
+      margin-bottom: 1rem;
+    }
+    .step-title {
+      font-size: .95rem; font-weight: 500; margin-bottom: .6rem; color: var(--paper);
+    }
+    .step-desc { font-size: .78rem; color: var(--stone); line-height: 1.75; }
+
+    .features {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 1rem; margin-bottom: 5rem;
+    }
+    .feature {
+      border: 1px solid var(--border); padding: 1.5rem;
+      transition: border-color .2s;
+    }
+    .feature:hover { border-color: rgba(0,200,150,.3); }
+    .feature-icon { font-size: 1.3rem; margin-bottom: .75rem; }
+    .feature-title { font-size: .82rem; font-weight: 500; margin-bottom: .4rem; }
+    .feature-desc { font-size: .75rem; color: var(--stone); line-height: 1.7; }
+
+    /* ── FONTES ── */
+    .sources-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 1px; background: var(--border);
+      border: 1px solid var(--border);
+      margin-bottom: 5rem;
+    }
+    .source {
+      background: #111; padding: 1.5rem 1.75rem;
+    }
+    .source-type {
+      font-size: .6rem; letter-spacing: .12em; text-transform: uppercase;
+      color: var(--signal); margin-bottom: .5rem;
+    }
+    .source-name { font-size: .85rem; font-weight: 500; margin-bottom: .35rem; }
+    .source-desc { font-size: .73rem; color: var(--stone); line-height: 1.6; }
+
+    /* ── CTA ── */
+    .cta-block {
+      border: 1px solid rgba(0,200,150,.25);
+      background: rgba(0,200,150,.04);
+      padding: 3rem 2.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 2rem;
+    }
+    .cta-text h3 {
+      font-size: clamp(1.1rem, 2vw, 1.5rem); font-weight: 300;
+      letter-spacing: -.01em; margin-bottom: .5rem;
+    }
+    .cta-text p { font-size: .8rem; color: var(--stone); }
+
+    .btn-ghost {
+      display: inline-block;
+      padding: .85rem 2rem;
+      background: transparent; color: var(--paper);
+      font-family: 'DM Mono', monospace; font-size: .78rem;
+      letter-spacing: .08em; text-decoration: none;
+      border: 1px solid #444; transition: border-color .2s;
+    }
+    .btn-ghost:hover { border-color: var(--stone); }
+
+    /* ── FOOTER ── */
     footer {
-      background-color: #002b45;
-      color: white;
-      text-align: center;
-      padding: 10px;
-      margin-top: 40px;
+      border-top: 1px solid var(--border);
+      padding: 1.75rem clamp(1.5rem, 5vw, 4rem);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .footer-brand { display: flex; align-items: center; gap: .65rem; }
+    .footer-copy { font-size: .68rem; color: var(--stone); letter-spacing: .06em; }
+    .footer-link {
+      font-size: .68rem; color: var(--stone); text-decoration: none;
+      letter-spacing: .08em; transition: color .2s;
+    }
+    .footer-link:hover { color: var(--signal); }
+
+    /* ── ANIMATIONS ── */
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: .5; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .steps { grid-template-columns: 1fr; }
+      .features { grid-template-columns: 1fr; }
+      .sources-grid { grid-template-columns: 1fr; }
+      .cta-block { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>NeoOtto.ai – Missão III</h1>
-    <p>Desenvolvimento do Oráculo.AI “NeoOtto.ai” – Consultor de Oportunidades</p>
-  </header>
 
-  <main>
-    <h2>🎯 Objetivo do Projeto</h2>
-    <p>A Missão III da Pós-Graduação em IA Aplicada à Gestão (ISCTE) desafiou o grupo a criar um GPT especializado para ajudar gestores a identificar oportunidades de negócio com base em IA.</p>
+<!-- ── NAV ── -->
+<nav>
+  <a href="https://nankov-ai.github.io/NeoOtto.github.io/" class="nav-logo">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <rect x="2" y="2" width="9" height="9" rx="1.5" fill="#f5f4f0"/>
+      <rect x="13" y="2" width="9" height="9" rx="1.5" fill="none" stroke="#f5f4f0" stroke-width="1.2"/>
+      <rect x="2" y="13" width="9" height="9" rx="1.5" fill="none" stroke="#f5f4f0" stroke-width="1.2"/>
+      <rect x="13" y="13" width="9" height="9" rx="1.5" fill="#00c896"/>
+    </svg>
+    <span class="nav-wordmark">Nodeflow</span>
+    <span class="nav-sub">/ NeoOtto.ai</span>
+  </a>
+</nav>
 
-    <h2>⚙️ Como funciona o Oráculo</h2>
-    <ul>
-      <li>Diagnóstico → Oportunidade → Recomendação</li>
-      <li>Tom consultivo e linguagem executiva</li>
-      <li>Adapta-se a PME, retalho, indústria ou serviços</li>
-      <li>Integra frameworks como AI Project Canvas e AI Act</li>
-    </ul>
+<!-- ── HERO ── -->
+<div class="hero">
+  <div class="hero-badge"><span class="badge-dot"></span>Agente IA · ChatGPT</div>
+  <h1 class="hero-title">NeoOtto<span class="highlight">.ai</span></h1>
+  <p class="hero-sub">Consultor de oportunidades de negócio. Diagnóstico rápido, recomendações práticas, linguagem executiva.</p>
+  <a href="https://chatgpt.com/g/g-6867dda33f808191a1c2e26f47d4fa1c-neootto-ai" target="_blank" rel="noopener" class="btn-primary">Abrir agente no ChatGPT →</a>
+</div>
 
-      <h2>📚 Fontes do Oráculo</h2>
-    <table>
-      <tr>
-        <th>Tipo</th>
-        <th>Exemplo</th>
-        <th>Aplicação</th>
-      </tr>
-      <tr>
-        <td>Livro</td>
-        <td>AI_Novator (ISCTE)</td>
-        <td>Fundamento ético e estratégico</td>
-      </tr>
-      <tr>
-        <td>Estudos</td>
-        <td>McKinsey, BCG, Roland Berger</td>
-        <td>Benchmark e viabilidade</td>
-      </tr>
-      <tr>
-        <td>Regulamento</td>
-        <td>EU AI Act (2024)</td>
-        <td>Conformidade e avaliação de risco</td>
-      </tr>
-      <tr>
-        <td>Frameworks</td>
-        <td>AI Project Canvas</td>
-        <td>Organização e diagnóstico</td>
-      </tr>
-    </table>
+<!-- ── CONTENT ── -->
+<div class="content">
 
-    <h2>🔗 Ligações Importantes</h2>
-    <a class="button" href="https://chatgpt.com/g/g-6867dda33f808191a1c2e26f47d4fa1c-neootto-ai" target="_blank">🚀 Aceder ao Oráculo no ChatGPT</a>
-    <a class="button" href="https://drive.google.com/file/d/1fnypY3ntZ6NbleWoP4lA7w2E1Yep55l5/view?usp=drive_link" target="_blank">📘 Explicação do Processo e Fontes</a>
-  </main>
+  <!-- Como funciona -->
+  <p class="section-label">Como funciona</p>
+  <h2 class="section-title">Três passos. Uma decisão mais informada.</h2>
 
-  <footer>
-    <p>GT4 – Fernando Costa, Maria Vieira, Miguel Anim, José Luís, José Gomes, Rui Baltazar – ISCTE 2025</p>
-  </footer>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01 · Diagnóstico</div>
+      <div class="step-title">Análise do contexto</div>
+      <p class="step-desc">O agente começa por perceber o sector, dimensão e maturidade digital da empresa. PME, retalho, indústria ou serviços.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02 · Oportunidade</div>
+      <div class="step-title">Identificação de alavancas</div>
+      <p class="step-desc">Cruza o diagnóstico com benchmarks de mercado (McKinsey, BCG, Roland Berger) e frameworks de IA aplicada para identificar onde a IA tem maior impacto.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03 · Recomendação</div>
+      <div class="step-title">Plano de acção</div>
+      <p class="step-desc">Entrega recomendações concretas, priorizadas por impacto e viabilidade, com considerações de conformidade (EU AI Act).</p>
+    </div>
+  </div>
+
+  <!-- Características -->
+  <p class="section-label">Características</p>
+  <h2 class="section-title">Construído para gestores, não para técnicos.</h2>
+
+  <div class="features">
+    <div class="feature">
+      <div class="feature-icon">◎</div>
+      <div class="feature-title">Tom consultivo</div>
+      <p class="feature-desc">Linguagem executiva, directa e sem jargão técnico. Foca-se em decisões de negócio, não em arquitectura de sistemas.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">⬡</div>
+      <div class="feature-title">Adaptável ao sector</div>
+      <p class="feature-desc">Ajusta o diagnóstico e as recomendações ao contexto específico — PME, grande empresa, retalho, indústria ou serviços.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">◈</div>
+      <div class="feature-title">Conformidade EU AI Act</div>
+      <p class="feature-desc">Integra considerações regulatórias desde o início, garantindo que as oportunidades identificadas são viáveis e conformes.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">▣</div>
+      <div class="feature-title">Baseado em evidências</div>
+      <p class="feature-desc">Fundamentado em estudos de McKinsey, BCG e Roland Berger, além do framework AI Project Canvas para organização e diagnóstico.</p>
+    </div>
+  </div>
+
+  <!-- Fontes -->
+  <p class="section-label">Base de conhecimento</p>
+  <h2 class="section-title">Fontes que fundamentam as recomendações.</h2>
+
+  <div class="sources-grid">
+    <div class="source">
+      <div class="source-type">Livro</div>
+      <div class="source-name">AI_Novator (ISCTE)</div>
+      <p class="source-desc">Fundamento ético e estratégico para a aplicação de IA em contexto empresarial.</p>
+    </div>
+    <div class="source">
+      <div class="source-type">Estudos de mercado</div>
+      <div class="source-name">McKinsey, BCG, Roland Berger</div>
+      <p class="source-desc">Benchmark de adopção de IA por sector, casos de uso validados e estimativas de impacto.</p>
+    </div>
+    <div class="source">
+      <div class="source-type">Regulamento</div>
+      <div class="source-name">EU AI Act (2024)</div>
+      <p class="source-desc">Conformidade regulatória europeia e avaliação de risco para cada categoria de aplicação.</p>
+    </div>
+    <div class="source">
+      <div class="source-type">Framework</div>
+      <div class="source-name">AI Project Canvas</div>
+      <p class="source-desc">Estrutura de diagnóstico e organização para projectos de IA aplicada à gestão.</p>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-block">
+    <div class="cta-text">
+      <h3>Experimenta o NeoOtto.ai</h3>
+      <p>Disponível gratuitamente no ChatGPT. Descreve a tua empresa e recebe um diagnóstico em minutos.</p>
+    </div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+      <a href="https://chatgpt.com/g/g-6867dda33f808191a1c2e26f47d4fa1c-neootto-ai" target="_blank" rel="noopener" class="btn-primary">Abrir agente →</a>
+      <a href="https://drive.google.com/file/d/1fnypY3ntZ6NbleWoP4lA7w2E1Yep55l5/view?usp=drive_link" target="_blank" rel="noopener" class="btn-ghost">Ver documentação</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-brand">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+      <rect x="2" y="2" width="9" height="9" rx="1.5" fill="#f5f4f0"/>
+      <rect x="13" y="2" width="9" height="9" rx="1.5" fill="none" stroke="#f5f4f0" stroke-width="1.2"/>
+      <rect x="2" y="13" width="9" height="9" rx="1.5" fill="none" stroke="#f5f4f0" stroke-width="1.2"/>
+      <rect x="13" y="13" width="9" height="9" rx="1.5" fill="#00c896"/>
+    </svg>
+    <span class="footer-copy">© 2026 Nodeflow · NeoOtto.ai</span>
+  </div>
+  <a href="https://nankov-ai.github.io/" class="footer-link">← Voltar ao portfolio</a>
+</footer>
+
 </body>
 </html>
